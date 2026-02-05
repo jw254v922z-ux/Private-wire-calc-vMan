@@ -136,22 +136,51 @@ export function generatePDFReport(options: PDFReportOptions) {
   );
   addText("Use this tool for preliminary assessment only. Engage qualified professionals for detailed feasibility studies.", 10);
 
-  // ===== KEY METRICS =====
-  checkPageBreak(50);
-  addSection("KEY FINANCIAL METRICS");
+  // ===== STAKEHOLDER METRICS =====
+  checkPageBreak(80);
+  addSection("STAKEHOLDER METRICS");
 
-  const metrics = [
+  // Project Details
+  addText("Project Details", 11, true);
+  const projectMetrics = [
     ["Metric", "Value"],
     ["Total CAPEX", formatCurrency(results.summary.totalCapex)],
     ["LCOE (Discounted)", formatCurrency(results.summary.lcoe) + "/MWh"],
-    ["LCOE (Undiscounted)", formatCurrency(results.summary.undiscountedLcoe) + "/MWh"],
     ["IRR (Unlevered)", results.summary.irr.toFixed(2) + "%"],
-    ["Payback Period", results.summary.paybackPeriod],
-    ["Annual Savings", formatCurrency(results.summary.annualSavings) + "/year"],
-    ["Total Generation (25yr)", formatNumberWithCommas(results.summary.totalGeneration.toFixed(0)) + " MWh"],
+    ["Payback Period", results.summary.paybackPeriod.toFixed(2) + " years"],
+    ["Total NPV", formatCurrency(results.summary.totalDiscountedCashFlow)],
   ];
+  addSimpleTable(projectMetrics[0] as string[], projectMetrics.slice(1) as (string | number)[][]);
 
-  addSimpleTable(metrics[0] as string[], metrics.slice(1) as (string | number)[][]);
+  checkPageBreak(40);
+  // Offtaker
+  addText("Offtaker", 11, true);
+  const offtakerMetrics = [
+    ["Metric", "Value"],
+    ["Yearly Savings", formatCurrency(results.summary.yearlySavings) + "/year"],
+    ["Total Savings", formatCurrency(results.summary.totalSavings)],
+  ];
+  addSimpleTable(offtakerMetrics[0] as string[], offtakerMetrics.slice(1) as (string | number)[][]);
+
+  checkPageBreak(40);
+  // Landowner
+  addText("Landowner", 11, true);
+  const landownerMetrics = [
+    ["Metric", "Value"],
+    ["Yearly Rental Income", formatCurrency(results.summary.yearlyRentalIncome) + "/year"],
+    ["Total Rental Income", formatCurrency(results.summary.totalLandOptionIncome)],
+    ["Land Rental Yield", results.summary.landOptionYield.toFixed(2) + "%"],
+  ];
+  addSimpleTable(landownerMetrics[0] as string[], landownerMetrics.slice(1) as (string | number)[][]);
+
+  checkPageBreak(40);
+  // Developer
+  addText("Developer", 11, true);
+  const developerMetrics = [
+    ["Metric", "Value"],
+    ["Developer Premium", formatCurrency(results.summary.totalDeveloperPremium)],
+  ];
+  addSimpleTable(developerMetrics[0] as string[], developerMetrics.slice(1) as (string | number)[][]);
 
   // ===== PROJECT PARAMETERS =====
   checkPageBreak(60);
@@ -207,7 +236,7 @@ export function generatePDFReport(options: PDFReportOptions) {
   const opexBreakdown = [
     ["Cost Type", "Year 1 (GBP)"],
     ["Base OPEX", formatCurrency(inputs.mw * inputs.opexPerMW)],
-    ...(inputs.landOptionEnabled ? [["Land Option Cost", formatCurrency(inputs.mw * inputs.landOptionCostPerMWYear * (1 - inputs.landOptionDiscount / 100))]] : []),
+    ...(inputs.landOptionEnabled ? [["Land Rental Cost", formatCurrency(inputs.mw * inputs.landOptionCostPerMWYear * (1 - inputs.landOptionDiscount / 100))]] : []),
     ["Total Year 1 OPEX", formatCurrency(results.yearlyData[1]?.opex || 0)],
   ];
 
@@ -298,6 +327,7 @@ export function generatePDFReport(options: PDFReportOptions) {
     }
     
     doc.setFont(undefined as any, 'bold');
+    doc.setFontSize(10);
     doc.text(`${idx + 1}. ${item.title}`, 20, yPos);
     yPos += 6;
     

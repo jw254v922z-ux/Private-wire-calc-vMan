@@ -143,3 +143,12 @@
 - [x] Centralize pie chart on landing page
 - [x] Test all stakeholder metrics display correctly
 - [ ] Save checkpoint and push to GitHub
+
+
+### Phase 17: Land Value Input and Rental Yield Calculation
+- [x] Add Land Value number input field to parameters panel
+- [x] Update Land Rental Yield calculation to use Land Value instead of CAPEX
+- [x] Update PDF export to include all stakeholder metrics (Project Details, Offtaker, Landowner, Developer)
+- [x] Test Land Value input updates Land Rental Yield correctly
+- [x] Test PDF export includes all four stakeholder sections
+- [ ] Save checkpoint and push to GitHub

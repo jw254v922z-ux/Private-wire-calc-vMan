@@ -114,6 +114,7 @@ export default function Dashboard() {
         offsetableEnergyCPI: 2.5,
         gridCostOverrideEnabled: false,
         gridCostOverride: 0,
+        landValue: 0,
       });
       setModelName(model.name);
       setModelDescription(model.description || "");
@@ -292,7 +293,7 @@ export default function Dashboard() {
       {/* Hero Header */}
       <div className="relative bg-slate-900 text-white pb-24 pt-12 overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-40">
-           <img src="/images/solar-hero.jpg" alt="Solar Farm" className="w-full h-full object-cover" />
+           <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663312201571/FyKDbvLKydspiJJE.jpg" alt="Solar Farm" className="w-full h-full object-cover" />
            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 to-slate-900/95" />
         </div>
         
@@ -621,6 +622,18 @@ export default function Dashboard() {
                       />
                     </div>
                   )}
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label>Land Value (£)</Label>
+                      <span className="text-sm font-mono">{formatNumberWithCommas(inputs.landValue)}</span>
+                    </div>
+                    <Input 
+                      type="text" 
+                      value={formatNumberWithCommas(inputs.landValue)} 
+                      onChange={(e) => handleInputChange("landValue", Number(e.target.value.replace(/,/g, '')))} 
+                    />
+                  </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between">

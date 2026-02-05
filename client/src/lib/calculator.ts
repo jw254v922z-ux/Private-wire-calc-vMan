@@ -25,6 +25,7 @@ export interface SolarInputs {
   offsetableEnergyCPI: number; // % annual CPI escalation for offsetable energy cost
   gridCostOverrideEnabled: boolean; // Enable/disable grid cost overrides
   gridCostOverride: number; // Custom total grid connection cost (£) when override enabled
+  landValue: number; // Land value (£) for calculating land rental yield
   cableVoltageKV?: number; // Cable voltage in kV (for sensitivity analysis highlighting)
   distanceKm?: number; // Distance in km (for sensitivity analysis highlighting)
 }
@@ -232,8 +233,8 @@ export function calculateSolarModel(inputs: SolarInputs): SolarResults {
     totalLandOptionIncome += landOptionCost;
   }
 
-  // Calculate land option yield (annual income as % of total project value)
-  const landOptionYield = totalCapex > 0 ? (landOptionCostYear1 / totalCapex) * 100 : 0;
+  // Calculate land rental yield (annual income as % of land value)
+  const landOptionYield = inputs.landValue > 0 ? (landOptionCostYear1 / inputs.landValue) * 100 : 0;
 
   // Calculate yearly and total savings
   // Savings = (Avoided Cost - PPA Price) * Energy
@@ -310,4 +311,5 @@ export const defaultInputs: SolarInputs = {
   offsetableEnergyCPI: 2.5, // Annual CPI escalation for offsetable energy cost (%)
   gridCostOverrideEnabled: false,
   gridCostOverride: 0,
+  landValue: 0, // Land value (£) for calculating land rental yield
 };
