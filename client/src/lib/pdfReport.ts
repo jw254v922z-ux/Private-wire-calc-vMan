@@ -28,13 +28,17 @@ export function generatePDFReport(options: PDFReportOptions) {
 
   // Helper function to add section
   const addSection = (title: string, fontSize: number = 14) => {
+    checkPageBreak(25);
     doc.setFontSize(fontSize);
     doc.setFont("helvetica", "bold");
-    doc.text(title, 20, yPosition);
+    doc.setTextColor(41, 128, 185); // Professional blue
+    doc.text(title.toUpperCase(), 20, yPosition);
+    yPosition += 4;
+    doc.setDrawColor(41, 128, 185);
+    doc.setLineWidth(0.5);
+    doc.line(20, yPosition, pageWidth - 20, yPosition);
     yPosition += 10;
-    doc.setDrawColor(200);
-    doc.line(20, yPosition - 3, pageWidth - 20, yPosition - 3);
-    yPosition += 5;
+    doc.setTextColor(0, 0, 0);
   };
 
   const addText = (text: string, fontSize: number = 11, bold: boolean = false) => {
@@ -103,42 +107,106 @@ export function generatePDFReport(options: PDFReportOptions) {
   };
 
   // ===== TITLE PAGE =====
-  doc.setFontSize(24);
+  doc.setFillColor(41, 128, 185);
+  doc.rect(0, 0, pageWidth, 50, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(28);
   doc.setFont("helvetica", "bold");
-  doc.text("Private Wire Solar Calculator", 20, yPosition);
-  yPosition += 15;
-
+  doc.text("Private Wire Solar Calculator", pageWidth / 2, 25, { align: "center" });
   doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("Project Summary Report", 20, yPosition);
-  yPosition += 15;
-
-  doc.setFontSize(12);
   doc.setFont("helvetica", "normal");
-  addText(`Project Name: ${projectName}`);
-  if (description) {
-    addText(`Description: ${description}`);
-  }
-  addText(`Generated: ${generatedDate.toLocaleDateString()} ${generatedDate.toLocaleTimeString()}`);
-  addText(`Report Version: 1.0`);
+  doc.text("Project Summary Report", pageWidth / 2, 38, { align: "center" });
+  
+  doc.setTextColor(0, 0, 0);
+  yPosition = 70;
 
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  
+  doc.setFillColor(245, 247, 250);
+  doc.roundedRect(20, yPosition, pageWidth - 40, 35, 3, 3, "F");
   yPosition += 10;
-  doc.setDrawColor(0);
-  doc.line(20, yPosition, pageWidth - 20, yPosition);
-  yPosition += 15;
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("Project:", 25, yPosition);
+  doc.setFont("helvetica", "normal");
+  doc.text(projectName, 55, yPosition);
+  yPosition += 8;
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("Generated:", 25, yPosition);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${generatedDate.toLocaleDateString()} ${generatedDate.toLocaleTimeString()}`, 55, yPosition);
+  
+  if (description) {
+    yPosition += 8;
+    doc.setFont("helvetica", "bold");
+    doc.text("Description:", 25, yPosition);
+    doc.setFont("helvetica", "normal");
+    const descLines = doc.splitTextToSize(description, pageWidth - 85);
+    doc.text(descLines, 55, yPosition);
+    yPosition += (descLines.length - 1) * 5;
+  }
+  
+  yPosition = 115;
+
+  // ===== STAKEHOLDER VALUE DISTRIBUTION (PIE CHART MOCKUP) =====
+  addSection("Stakeholder Value Distribution");
+  
+  const projectValue = Math.max(0, results.summary.totalDiscountedCashFlow);
+  const offtakerValue = Math.max(0, results.summary.totalSavings);
+  const landownerValue = Math.max(0, results.summary.totalLandOptionIncome);
+  const developerValue = Math.max(0, results.summary.totalDeveloperPremium);
+  const totalValue = projectValue + offtakerValue + landownerValue + developerValue;
+  
+  const pieData = [
+    { name: "Project", value: projectValue, color: [139, 92, 246] },
+    { name: "Offtaker", value: offtakerValue, color: [16, 185, 129] },
+    { name: "Landowner", value: landownerValue, color: [245, 158, 11] },
+    { name: "Developer", value: developerValue, color: [236, 72, 153] }
+  ];
+
+  // Draw simple circular chart representaton
+  const centerX = 60;
+  const centerY = yPosition + 25;
+  const radius = 20;
+  
+  // Legend to the right
+  let legendY = yPosition + 10;
+  pieData.forEach((item) => {
+    const percentage = totalValue > 0 ? ((item.value / totalValue) * 100).toFixed(1) : "0";
+    doc.setFillColor(item.color[0], item.color[1], item.color[2]);
+    doc.rect(100, legendY, 6, 6, "F");
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text(item.name, 110, legendY + 5);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${formatCurrency(item.value)} (${percentage}%)`, 140, legendY + 5);
+    legendY += 10;
+  });
+
+  // Placeholder circle for pie chart
+  doc.setDrawColor(200);
+  doc.setLineWidth(0.5);
+  doc.circle(centerX, centerY, radius, "S");
+  doc.setFontSize(8);
+  doc.text("Value Split", centerX, centerY, { align: "center" });
+  
+  yPosition = Math.max(centerY + 35, legendY + 15);
 
   // ===== DISCLAIMER =====
-  checkPageBreak(40);
-  addSection("DISCLAIMER", 12);
-  addText(
-    "This report contains indicative projections based on January 2026 data and assumptions. These projections are not suitable for investment decisions without professional verification. Actual results may differ materially from projections due to changes in market conditions, technology, policy, and site-specific factors.",
-    10
-  );
-  addText("Use this tool for preliminary assessment only. Engage qualified professionals for detailed feasibility studies.", 10);
+  addSection("Disclaimer");
+  doc.setFontSize(9);
+  doc.setTextColor(100);
+  const disclaimerText = "This report contains indicative projections based on current data and assumptions. These projections are not suitable for investment decisions without professional verification. Actual results may differ materially from projections due to changes in market conditions, technology, policy, and site-specific factors. Use this tool for preliminary assessment only. Engage qualified professionals for detailed feasibility studies.";
+  const disclaimerLines = doc.splitTextToSize(disclaimerText, pageWidth - 40);
+  doc.text(disclaimerLines, 20, yPosition);
+  yPosition += (disclaimerLines.length * 5) + 10;
+  doc.setTextColor(0);
 
   // ===== STAKEHOLDER METRICS =====
-  checkPageBreak(80);
-  addSection("STAKEHOLDER METRICS");
+  addSection("Stakeholder Metrics");
 
   // Project Details
   addText("Project Details", 11, true);
