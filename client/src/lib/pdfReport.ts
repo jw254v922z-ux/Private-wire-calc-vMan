@@ -28,16 +28,17 @@ export function generatePDFReport(options: PDFReportOptions) {
 
   // Helper function to add section
   const addSection = (title: string, fontSize: number = 14) => {
-    checkPageBreak(25);
+    checkPageBreak(35);
+    yPosition += 8; // Increased top margin for section
     doc.setFontSize(fontSize);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(41, 128, 185); // Professional blue
+    doc.setTextColor(26, 54, 93); // Corporate dark blue
     doc.text(title.toUpperCase(), 20, yPosition);
     yPosition += 4;
-    doc.setDrawColor(41, 128, 185);
-    doc.setLineWidth(0.5);
+    doc.setDrawColor(200, 210, 220); // Slightly more visible slate border
+    doc.setLineWidth(0.75);
     doc.line(20, yPosition, pageWidth - 20, yPosition);
-    yPosition += 10;
+    yPosition += 12; // Increased bottom margin after line
     doc.setTextColor(0, 0, 0);
   };
 
@@ -54,49 +55,43 @@ export function generatePDFReport(options: PDFReportOptions) {
     const widths = colWidths || headers.map(() => defaultColWidth);
     
     // Header row
-    doc.setFillColor(41, 128, 185);
-    doc.setTextColor(255, 255, 255);
+    doc.setFillColor(248, 250, 252); // Light slate background
+    doc.setTextColor(30, 41, 59); // Dark slate text
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     
     let xPos = 20;
     headers.forEach((header, i) => {
-      doc.rect(xPos, yPosition, widths[i], 8, "F");
-      doc.text(header, xPos + 2, yPosition + 6);
+      doc.rect(xPos, yPosition, widths[i], 10, "F");
+      doc.setDrawColor(226, 232, 240);
+      doc.rect(xPos, yPosition, widths[i], 10, "S");
+      doc.text(header, xPos + 4, yPosition + 6.5);
       xPos += widths[i];
     });
-    yPosition += 8;
+    yPosition += 10;
     
     // Data rows
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(51, 65, 85);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     
     rows.forEach((row, rowIndex) => {
-      if (yPosition > pageHeight - 20) {
+      if (yPosition > pageHeight - 30) {
         doc.addPage();
-        yPosition = 20;
-      }
-      
-      // Alternate row colors
-      if (rowIndex % 2 === 1) {
-        doc.setFillColor(245, 245, 245);
-        xPos = 20;
-        headers.forEach((_, i) => {
-          doc.rect(xPos, yPosition, widths[i], 7, "F");
-          xPos += widths[i];
-        });
+        yPosition = 25;
       }
       
       xPos = 20;
       row.forEach((cell, i) => {
-        doc.text(String(cell), xPos + 2, yPosition + 5);
+        doc.setDrawColor(241, 245, 249);
+        doc.rect(xPos, yPosition, widths[i], 8, "S");
+        doc.text(String(cell), xPos + 4, yPosition + 5.5);
         xPos += widths[i];
       });
-      yPosition += 7;
+      yPosition += 8;
     });
     
-    yPosition += 3;
+    yPosition += 5;
   };
 
   const checkPageBreak = (neededSpace: number = 30) => {
@@ -150,7 +145,7 @@ export function generatePDFReport(options: PDFReportOptions) {
   
   yPosition = 115;
 
-  // ===== STAKEHOLDER VALUE DISTRIBUTION (PIE CHART MOCKUP) =====
+  // ===== STAKEHOLDER VALUE DISTRIBUTION (PIE CHART) =====
   addSection("Stakeholder Value Distribution");
   
   const projectValue = Math.max(0, results.summary.totalDiscountedCashFlow);
@@ -160,40 +155,68 @@ export function generatePDFReport(options: PDFReportOptions) {
   const totalValue = projectValue + offtakerValue + landownerValue + developerValue;
   
   const pieData = [
-    { name: "Project", value: projectValue, color: [139, 92, 246] },
-    { name: "Offtaker", value: offtakerValue, color: [16, 185, 129] },
-    { name: "Landowner", value: landownerValue, color: [245, 158, 11] },
-    { name: "Developer", value: developerValue, color: [236, 72, 153] }
+    { name: "Project", value: projectValue, color: [100, 116, 139] }, // Slate
+    { name: "Offtaker", value: offtakerValue, color: [30, 64, 175] }, // Corporate Blue
+    { name: "Landowner", value: landownerValue, color: [15, 118, 110] }, // Teal
+    { name: "Developer", value: developerValue, color: [51, 65, 85] } // Deep Slate
   ];
 
-  // Draw simple circular chart representaton
-  const centerX = 60;
-  const centerY = yPosition + 25;
-  const radius = 20;
-  
-  // Legend to the right
-  let legendY = yPosition + 10;
+  const centerX = 65;
+  const centerY = yPosition + 30;
+  const radius = 28;
+  let currentAngle = -Math.PI / 2; // Start from top
+
+  if (totalValue > 0) {
+    pieData.forEach((item) => {
+      if (item.value <= 0) return;
+      
+      const sliceAngle = (item.value / totalValue) * 2 * Math.PI;
+      doc.setFillColor(item.color[0], item.color[1], item.color[2]);
+      
+      // Approximation of a circle sector using triangles
+      const segments = 40;
+      for (let i = 0; i < segments; i++) {
+        const a1 = currentAngle + (sliceAngle * i) / segments;
+        const a2 = currentAngle + (sliceAngle * (i + 1)) / segments;
+        
+        doc.triangle(
+          centerX, centerY,
+          centerX + Math.cos(a1) * radius, centerY + Math.sin(a1) * radius,
+          centerX + Math.cos(a2) * radius, centerY + Math.sin(a2) * radius,
+          "F"
+        );
+      }
+      currentAngle += sliceAngle;
+    });
+    
+    // Add white border to pie
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(1);
+    doc.circle(centerX, centerY, radius, "S");
+  } else {
+    doc.setDrawColor(226, 232, 240);
+    doc.circle(centerX, centerY, radius, "S");
+    doc.setFontSize(10);
+    doc.text("No Value Data", centerX, centerY, { align: "center" });
+  }
+
+  // Legend
+  let legendY = yPosition + 12;
   pieData.forEach((item) => {
     const percentage = totalValue > 0 ? ((item.value / totalValue) * 100).toFixed(1) : "0";
     doc.setFillColor(item.color[0], item.color[1], item.color[2]);
-    doc.rect(100, legendY, 6, 6, "F");
-    doc.setTextColor(0, 0, 0);
+    doc.rect(115, legendY, 5, 5, "F");
+    doc.setTextColor(30, 41, 59);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text(item.name, 110, legendY + 5);
+    doc.text(item.name, 125, legendY + 4);
     doc.setFont("helvetica", "normal");
-    doc.text(`${formatCurrency(item.value)} (${percentage}%)`, 140, legendY + 5);
-    legendY += 10;
+    doc.setTextColor(71, 85, 105);
+    doc.text(`${formatCurrency(item.value)} (${percentage}%)`, 125, legendY + 9);
+    legendY += 15;
   });
-
-  // Placeholder circle for pie chart
-  doc.setDrawColor(200);
-  doc.setLineWidth(0.5);
-  doc.circle(centerX, centerY, radius, "S");
-  doc.setFontSize(8);
-  doc.text("Value Split", centerX, centerY, { align: "center" });
   
-  yPosition = Math.max(centerY + 35, legendY + 15);
+  yPosition = Math.max(centerY + 45, legendY + 5);
 
   // ===== DISCLAIMER =====
   addSection("Disclaimer");
