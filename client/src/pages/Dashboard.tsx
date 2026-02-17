@@ -471,10 +471,33 @@ export default function Dashboard() {
             {/* Parameters Card */}
             <Card className="shadow-lg border-t-4 border-t-primary">
               <CardHeader>
-                <CardTitle>Project Parameters</CardTitle>
-                <CardDescription>Adjust inputs to update the model</CardDescription>
+                <CardTitle>Project Details</CardTitle>
+                <CardDescription>Name and identify your solar model</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="project-name">Project Name</Label>
+                  <Input 
+                    id="project-name"
+                    value={modelName} 
+                    onChange={(e) => setModelName(e.target.value)} 
+                    placeholder="e.g. North Ridge Solar"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="project-description">Description (Optional)</Label>
+                  <Input 
+                    id="project-description"
+                    value={modelDescription} 
+                    onChange={(e) => setModelDescription(e.target.value)} 
+                    placeholder="Brief project overview"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Parameters Card */}
+            <Card className="shadow-lg border-t-4 border-t-primary">
                 
                 <div className="space-y-4">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">System Size</h3>

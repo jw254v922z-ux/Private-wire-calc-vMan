@@ -62,9 +62,10 @@ export function generatePDFReport(options: PDFReportOptions) {
     
     let xPos = 20;
     headers.forEach((header, i) => {
-      doc.rect(xPos, yPosition, widths[i], 10, "F");
-      doc.setDrawColor(226, 232, 240);
-      doc.rect(xPos, yPosition, widths[i], 10, "S");
+      // Draw header cell background and full border
+      doc.setDrawColor(203, 213, 225); // slate-300
+      doc.setLineWidth(0.1);
+      doc.rect(xPos, yPosition, widths[i], 10, "FD");
       doc.text(header, xPos + 4, yPosition + 6.5);
       xPos += widths[i];
     });
@@ -155,10 +156,10 @@ export function generatePDFReport(options: PDFReportOptions) {
   const totalValue = projectValue + offtakerValue + landownerValue + developerValue;
   
   const pieData = [
-    { name: "Project", value: projectValue, color: [100, 116, 139] }, // Slate
-    { name: "Offtaker", value: offtakerValue, color: [30, 64, 175] }, // Corporate Blue
-    { name: "Landowner", value: landownerValue, color: [15, 118, 110] }, // Teal
-    { name: "Developer", value: developerValue, color: [51, 65, 85] } // Deep Slate
+    { name: "Project", value: projectValue, color: [139, 92, 246] },
+    { name: "Offtaker", value: offtakerValue, color: [16, 185, 129] },
+    { name: "Landowner", value: landownerValue, color: [245, 158, 11] },
+    { name: "Developer", value: developerValue, color: [236, 72, 153] }
   ];
 
   const centerX = 65;
