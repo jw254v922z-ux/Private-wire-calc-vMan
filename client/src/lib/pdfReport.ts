@@ -237,7 +237,13 @@ export function generatePDFReport(options: PDFReportOptions) {
   addSection("Stakeholder Metrics");
 
   // Project Details
-  addText("Project Details", 11, true);
+  const projectColor = [139, 92, 246]; // Purple
+  doc.setFillColor(projectColor[0], projectColor[1], projectColor[2]);
+  doc.rect(20, yPosition, pageWidth - 40, 8, "F");
+  doc.setTextColor(255, 255, 255);
+  addText("Project", 11, true);
+  doc.setTextColor(0, 0, 0);
+  
   const projectMetrics = [
     ["Metric", "Value"],
     ["Total CAPEX", formatCurrency(results.summary.totalCapex)],
@@ -250,7 +256,13 @@ export function generatePDFReport(options: PDFReportOptions) {
 
   checkPageBreak(40);
   // Offtaker
+  const offtakerColor = [16, 185, 129]; // Green
+  doc.setFillColor(offtakerColor[0], offtakerColor[1], offtakerColor[2]);
+  doc.rect(20, yPosition, pageWidth - 40, 8, "F");
+  doc.setTextColor(255, 255, 255);
   addText("Offtaker", 11, true);
+  doc.setTextColor(0, 0, 0);
+  
   const offtakerMetrics = [
     ["Metric", "Value"],
     ["Yearly Savings", formatCurrency(results.summary.yearlySavings) + "/year"],
@@ -260,7 +272,13 @@ export function generatePDFReport(options: PDFReportOptions) {
 
   checkPageBreak(40);
   // Landowner
+  const landownerColor = [245, 158, 11]; // Amber
+  doc.setFillColor(landownerColor[0], landownerColor[1], landownerColor[2]);
+  doc.rect(20, yPosition, pageWidth - 40, 8, "F");
+  doc.setTextColor(255, 255, 255);
   addText("Landowner", 11, true);
+  doc.setTextColor(0, 0, 0);
+  
   const landownerMetrics = [
     ["Metric", "Value"],
     ["Yearly Rental Income", formatCurrency(results.summary.yearlyRentalIncome) + "/year"],
@@ -271,7 +289,13 @@ export function generatePDFReport(options: PDFReportOptions) {
 
   checkPageBreak(40);
   // Developer
+  const developerColor = [236, 72, 153]; // Pink
+  doc.setFillColor(developerColor[0], developerColor[1], developerColor[2]);
+  doc.rect(20, yPosition, pageWidth - 40, 8, "F");
+  doc.setTextColor(255, 255, 255);
   addText("Developer", 11, true);
+  doc.setTextColor(0, 0, 0);
+  
   const developerMetrics = [
     ["Metric", "Value"],
     ["Developer Premium", formatCurrency(results.summary.totalDeveloperPremium)],
