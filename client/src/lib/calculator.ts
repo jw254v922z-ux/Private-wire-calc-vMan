@@ -44,6 +44,8 @@ export interface YearData {
   discountedRevenue: number;
   discountedCashFlow: number;
   cumulativeDiscountedCashFlow: number;
+  savings: number;
+  landIncome: number;
 }
 
 export interface SolarResults {
@@ -153,7 +155,12 @@ export function calculateSolarModel(inputs: SolarInputs): SolarResults {
     discountedRevenue: 0,
     discountedCashFlow: -totalCapex,
     cumulativeDiscountedCashFlow: -totalCapex,
+    savings: 0,
+    landIncome: 0,
   });
+
+  // Calculate savings per MWh once
+  const savingsPerMWh = Math.max(0, inputs.offsetableEnergyCost - inputs.powerPrice);
 
   // Years 1 to Project Life
   for (let year = 1; year <= inputs.projectLife; year++) {
@@ -169,6 +176,8 @@ export function calculateSolarModel(inputs: SolarInputs): SolarResults {
     const exportGeneration = generation * (inputs.percentConsumptionExport / 100);
     const revenue = (ppaConsumption * inputs.powerPrice) + (exportGeneration * inputs.exportPrice);
     const cashFlow = revenue - opex; // Capex is 0 for these years
+    
+    const savings = generation * savingsPerMWh;
     
     cumulativeCashFlow += cashFlow;
 
@@ -194,6 +203,8 @@ export function calculateSolarModel(inputs: SolarInputs): SolarResults {
       discountedRevenue,
       discountedCashFlow,
       cumulativeDiscountedCashFlow,
+      savings,
+      landIncome: landOptionCost,
     });
   }
 

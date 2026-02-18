@@ -81,14 +81,13 @@ export function CashFlowTable({ yearlyData, projectName = "Solar Project" }: Cas
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-300">
                 <th className="px-3 py-2 text-left font-semibold text-slate-900">Year</th>
-                <th className="px-3 py-2 text-right font-semibold text-slate-900">Generation (MWh)</th>
-                <th className="px-3 py-2 text-right font-semibold text-slate-900">OPEX (£)</th>
-                <th className="px-3 py-2 text-right font-semibold text-slate-900">Revenue (£)</th>
-                <th className="px-3 py-2 text-right font-semibold text-slate-900">Nominal Cash Flow (£)</th>
+                <th className="px-3 py-2 text-right font-semibold text-slate-900">Gen (MWh)</th>
+                <th className="px-3 py-2 text-right font-semibold text-slate-900">Project CF (£)</th>
+                <th className="px-3 py-2 text-right font-semibold text-slate-900">Offtaker Sav. (£)</th>
+                <th className="px-3 py-2 text-right font-semibold text-slate-900">Land Rent (£)</th>
                 <th className="px-3 py-2 text-right font-semibold text-slate-900">Discount Factor</th>
-                <th className="px-3 py-2 text-right font-semibold text-slate-900">Discounted Revenue (£)</th>
-                <th className="px-3 py-2 text-right font-semibold text-slate-900">Discounted Cash Flow (£)</th>
-                <th className="px-3 py-2 text-right font-semibold text-slate-900">Cumulative DCF (£)</th>
+                <th className="px-3 py-2 text-right font-semibold text-slate-900">Disc. Project CF (£)</th>
+                <th className="px-3 py-2 text-right font-semibold text-slate-900">Cum. DCF (£)</th>
               </tr>
             </thead>
             <tbody>
@@ -103,20 +102,17 @@ export function CashFlowTable({ yearlyData, projectName = "Solar Project" }: Cas
                   <td className="px-3 py-2 text-right text-slate-700">
                     {formatNumberWithCommas(year.generation.toFixed(0))}
                   </td>
-                  <td className="px-3 py-2 text-right text-slate-700">
-                    {formatCurrency(year.opex)}
-                  </td>
-                  <td className="px-3 py-2 text-right text-slate-700 font-semibold text-green-700">
-                    {formatCurrency(year.revenue)}
-                  </td>
-                  <td className="px-3 py-2 text-right text-slate-700">
+                  <td className="px-3 py-2 text-right text-purple-700 font-medium">
                     {formatCurrency(year.cashFlow)}
+                  </td>
+                  <td className="px-3 py-2 text-right text-green-700 font-medium">
+                    {formatCurrency(year.savings || 0)}
+                  </td>
+                  <td className="px-3 py-2 text-right text-amber-700 font-medium">
+                    {formatCurrency(year.landIncome || 0)}
                   </td>
                   <td className="px-3 py-2 text-right text-slate-700 text-xs">
                     {year.discountFactor.toFixed(4)}
-                  </td>
-                  <td className="px-3 py-2 text-right text-slate-700 font-semibold">
-                    {formatCurrency(year.discountedRevenue)}
                   </td>
                   <td className="px-3 py-2 text-right text-slate-700">
                     {formatCurrency(year.discountedCashFlow)}
