@@ -250,7 +250,6 @@ export function calculateSolarModel(inputs: SolarInputs): SolarResults {
   // Calculate yearly and total savings
   // Savings = (Avoided Cost - PPA Price) * Energy
   // Only positive savings when PPA Price < Avoided Cost
-  const savingsPerMWh = Math.max(0, inputs.offsetableEnergyCost - inputs.powerPrice);
   const yearlySavings = (totalEnergy / inputs.projectLife) * savingsPerMWh;
   const totalSavings = totalEnergy * savingsPerMWh;
   
