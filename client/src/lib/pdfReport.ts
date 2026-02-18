@@ -60,12 +60,16 @@ export function generatePDFReport(options: PDFReportOptions) {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     
+    // Draw solid background for the whole header first to avoid "half-colored" look
+    const totalWidth = widths.reduce((a, b) => a + b, 0);
+    doc.rect(20, yPosition, totalWidth, 10, "F");
+    
     let xPos = 20;
     headers.forEach((header, i) => {
-      // Draw header cell background and full border
+      // Draw border for each cell
       doc.setDrawColor(203, 213, 225); // slate-300
       doc.setLineWidth(0.1);
-      doc.rect(xPos, yPosition, widths[i], 10, "FD");
+      doc.rect(xPos, yPosition, widths[i], 10, "S");
       doc.text(header, xPos + 4, yPosition + 6.5);
       xPos += widths[i];
     });

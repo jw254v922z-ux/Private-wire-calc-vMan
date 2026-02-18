@@ -498,6 +498,11 @@ export default function Dashboard() {
 
             {/* Parameters Card */}
             <Card className="shadow-lg border-t-4 border-t-primary">
+              <CardHeader>
+                <CardTitle>Project Parameters</CardTitle>
+                <CardDescription>Adjust inputs to update the model</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 
                 <div className="space-y-4">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">System Size</h3>
