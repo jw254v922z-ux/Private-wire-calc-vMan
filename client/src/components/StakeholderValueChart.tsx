@@ -95,13 +95,18 @@ export function StakeholderValueChart({ results }: StakeholderValueChartProps) {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percentage }) => `${name} (${percentage}%)`}
+                  label={({ name, percentage, value }) => value > 0 ? `${name} (${percentage}%)` : ''}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
                 >
                   {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={COLORS[index % COLORS.length]} 
+                      stroke={entry.value === 0 ? COLORS[index % COLORS.length] : '#fff'}
+                      strokeWidth={entry.value === 0 ? 0 : 1}
+                    />
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
