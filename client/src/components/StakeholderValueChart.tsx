@@ -47,7 +47,7 @@ export function StakeholderValueChart({ results }: StakeholderValueChartProps) {
       value: developerValue,
       percentage: totalValue > 0 ? ((developerValue / totalValue) * 100).toFixed(1) : 0,
     },
-  ].filter(item => item.value > 0);
+  ];
   
   const COLORS = ['#8b5cf6', '#10b981', '#f59e0b', '#ec4899'];
   
