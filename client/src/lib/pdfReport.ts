@@ -153,17 +153,23 @@ export function generatePDFReport(options: PDFReportOptions) {
   // ===== STAKEHOLDER VALUE DISTRIBUTION (PIE CHART) =====
   addSection("Stakeholder Value Distribution");
   
-  const projectValue = Math.max(0, results.summary.totalDiscountedCashFlow);
-  const offtakerValue = Math.max(0, results.summary.totalSavings);
-  const landownerValue = Math.max(0, results.summary.totalLandOptionIncome);
-  const developerValue = Math.max(0, results.summary.totalDeveloperPremium);
-  const totalValue = projectValue + offtakerValue + landownerValue + developerValue;
+  const projectValue = results.summary.totalDiscountedCashFlow;
+  const offtakerValue = results.summary.totalSavings;
+  const landownerValue = results.summary.totalLandOptionIncome;
+  const developerValue = results.summary.totalDeveloperPremium;
+  
+  // For the pie chart, we only show positive values
+  const pieProjectValue = Math.max(0, projectValue);
+  const pieOfftakerValue = Math.max(0, offtakerValue);
+  const pieLandownerValue = Math.max(0, landownerValue);
+  const pieDeveloperValue = Math.max(0, developerValue);
+  const totalPieValue = pieProjectValue + pieOfftakerValue + pieLandownerValue + pieDeveloperValue;
   
   const pieData = [
-    { name: "Project", value: projectValue, color: [139, 92, 246] },
-    { name: "Offtaker", value: offtakerValue, color: [16, 185, 129] },
-    { name: "Landowner", value: landownerValue, color: [245, 158, 11] },
-    { name: "Developer", value: developerValue, color: [236, 72, 153] }
+    { name: "Project", value: projectValue, pieValue: pieProjectValue, color: [139, 92, 246] },
+    { name: "Offtaker", value: offtakerValue, pieValue: pieOfftakerValue, color: [16, 185, 129] },
+    { name: "Landowner", value: landownerValue, pieValue: pieLandownerValue, color: [245, 158, 11] },
+    { name: "Developer", value: developerValue, pieValue: pieDeveloperValue, color: [236, 72, 153] }
   ];
 
   const centerX = 65;
@@ -171,11 +177,11 @@ export function generatePDFReport(options: PDFReportOptions) {
   const radius = 28;
   let currentAngle = -Math.PI / 2; // Start from top
 
-  if (totalValue > 0) {
+  if (totalPieValue > 0) {
     pieData.forEach((item) => {
-      if (item.value <= 0) return;
+      if (item.pieValue <= 0) return;
       
-      const sliceAngle = (item.value / totalValue) * 2 * Math.PI;
+      const sliceAngle = (item.pieValue / totalPieValue) * 2 * Math.PI;
       doc.setFillColor(item.color[0], item.color[1], item.color[2]);
       
       // Approximation of a circle sector using triangles
@@ -208,7 +214,7 @@ export function generatePDFReport(options: PDFReportOptions) {
   // Legend
   let legendY = yPosition + 12;
   pieData.forEach((item) => {
-    const percentage = totalValue > 0 ? ((item.value / totalValue) * 100).toFixed(1) : "0";
+    const percentage = totalPieValue > 0 ? ((item.pieValue / totalPieValue) * 100).toFixed(1) : "0";
     doc.setFillColor(item.color[0], item.color[1], item.color[2]);
     doc.rect(115, legendY, 5, 5, "F");
     doc.setTextColor(30, 41, 59);
@@ -241,8 +247,10 @@ export function generatePDFReport(options: PDFReportOptions) {
   doc.setFillColor(projectColor[0], projectColor[1], projectColor[2]);
   doc.rect(20, yPosition, pageWidth - 40, 8, "F");
   doc.setTextColor(255, 255, 255);
-  addText("Project", 11, true);
+  doc.setFont("helvetica", "bold");
+  doc.text("Project", 25, yPosition + 5.5);
   doc.setTextColor(0, 0, 0);
+  yPosition += 8;
   
   const projectMetrics = [
     ["Metric", "Value"],
@@ -260,8 +268,10 @@ export function generatePDFReport(options: PDFReportOptions) {
   doc.setFillColor(offtakerColor[0], offtakerColor[1], offtakerColor[2]);
   doc.rect(20, yPosition, pageWidth - 40, 8, "F");
   doc.setTextColor(255, 255, 255);
-  addText("Offtaker", 11, true);
+  doc.setFont("helvetica", "bold");
+  doc.text("Offtaker", 25, yPosition + 5.5);
   doc.setTextColor(0, 0, 0);
+  yPosition += 8;
   
   const offtakerMetrics = [
     ["Metric", "Value"],
@@ -276,8 +286,10 @@ export function generatePDFReport(options: PDFReportOptions) {
   doc.setFillColor(landownerColor[0], landownerColor[1], landownerColor[2]);
   doc.rect(20, yPosition, pageWidth - 40, 8, "F");
   doc.setTextColor(255, 255, 255);
-  addText("Landowner", 11, true);
+  doc.setFont("helvetica", "bold");
+  doc.text("Landowner", 25, yPosition + 5.5);
   doc.setTextColor(0, 0, 0);
+  yPosition += 8;
   
   const landownerMetrics = [
     ["Metric", "Value"],
@@ -293,8 +305,10 @@ export function generatePDFReport(options: PDFReportOptions) {
   doc.setFillColor(developerColor[0], developerColor[1], developerColor[2]);
   doc.rect(20, yPosition, pageWidth - 40, 8, "F");
   doc.setTextColor(255, 255, 255);
-  addText("Developer", 11, true);
+  doc.setFont("helvetica", "bold");
+  doc.text("Developer", 25, yPosition + 5.5);
   doc.setTextColor(0, 0, 0);
+  yPosition += 8;
   
   const developerMetrics = [
     ["Metric", "Value"],
@@ -310,7 +324,7 @@ export function generatePDFReport(options: PDFReportOptions) {
     ["Parameter", "Value"],
     ["Installed Capacity", formatNumberWithCommas(inputs.mw.toFixed(1)) + " MW"],
     ["Project Lifetime", inputs.projectLife + " years"],
-    ["Discount Rate", inputs.discountRate + "%"],
+    ["Discount Rate", (inputs.discountRate * 100).toFixed(1) + "%"],
     ["Panel Degradation", inputs.degradationRate + "%/year"],
     ["Annual CPI Inflation", inputs.costInflationRate + "%"],
     ["Export Price", formatCurrency(inputs.exportPrice) + "/MWh"],
@@ -362,24 +376,24 @@ export function generatePDFReport(options: PDFReportOptions) {
 
   addSimpleTable(opexBreakdown[0] as string[], opexBreakdown.slice(1) as (string | number)[][]);
 
-  // ===== CASH FLOW TABLE (simplified - show every 5 years) =====
+  // ===== CASH FLOW TABLE (Stakeholder Breakdown) =====
   checkPageBreak(60);
-  addSection("CASH FLOW SUMMARY (5-YEAR INTERVALS)");
+  addSection("CASH FLOW SUMMARY (STAKEHOLDER BREAKDOWN)");
 
   const cashFlowTableData = [
-    ["Year", "Gen (MWh)", "OPEX (GBP)", "Revenue (GBP)", "Disc. CF (GBP)"],
+    ["Year", "Proj CF", "Proj DCF", "Offt Sav", "Land Rent"],
     ...results.yearlyData
       .filter((_, i) => i === 0 || i % 5 === 0 || i === results.yearlyData.length - 1)
       .map((year) => [
         year.year.toString(),
-        formatNumberWithCommas(year.generation.toFixed(0)),
-        formatCurrency(year.opex),
-        formatCurrency(year.revenue),
+        formatCurrency(year.cashFlow),
         formatCurrency(year.discountedCashFlow),
+        formatCurrency(year.savings || 0),
+        formatCurrency(year.landIncome || 0),
       ]),
   ];
 
-  addSimpleTable(cashFlowTableData[0] as string[], cashFlowTableData.slice(1) as (string | number)[][], [15, 20, 20, 25, 25]);
+  addSimpleTable(cashFlowTableData[0] as string[], cashFlowTableData.slice(1) as (string | number)[][], [15, 25, 25, 20, 20]);
 
   // ===== DATA SOURCES =====
   checkPageBreak(60);
