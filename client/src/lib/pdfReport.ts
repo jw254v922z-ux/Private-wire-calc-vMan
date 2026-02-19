@@ -242,7 +242,7 @@ export function generatePDFReport(options: PDFReportOptions) {
   // ===== STAKEHOLDER METRICS =====
   addSection("Stakeholder Metrics");
 
-  // Project Details
+  // Project
   const projectColor = [139, 92, 246]; // Purple
   doc.setFillColor(projectColor[0], projectColor[1], projectColor[2]);
   doc.rect(20, yPosition, pageWidth - 40, 8, "F");
