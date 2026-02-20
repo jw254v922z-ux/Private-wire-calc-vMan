@@ -4,12 +4,15 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Dashboard from "./pages/Dashboard.static";
+import MapViewPage from "./pages/MapView";
 import { Toaster } from "sonner";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Dashboard} />
+      <Route path={"/:rest*"} component={Dashboard} />
+      <Route path={"/map"} component={MapViewPage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

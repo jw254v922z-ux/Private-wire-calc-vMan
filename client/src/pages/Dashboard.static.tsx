@@ -22,6 +22,7 @@ import { calculateSensitivityMatrix } from "@/lib/sensitivity";
 import { generatePDFReport } from "@/lib/pdfReport";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function Dashboard() {
   const [inputs, setInputs] = useState<SolarInputs>(defaultInputs);
@@ -155,6 +156,11 @@ export default function Dashboard() {
               <p className="text-slate-300">Advanced financial modeling for solar assets with private wire integration</p>
             </div>
             <div className="flex gap-2">
+              <Link href="/map">
+                <Button variant="outline" className="text-white border-white hover:bg-white/10">
+                  📍 Site Mapping
+                </Button>
+              </Link>
               <Button onClick={handleExportCSV} variant="outline" className="text-white border-white hover:bg-white/10">
                 📊 Export CSV
               </Button>
