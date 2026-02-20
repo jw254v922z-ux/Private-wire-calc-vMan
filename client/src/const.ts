@@ -8,14 +8,19 @@ export const getLoginUrl = () => {
     return "#";
   }
 
-  const redirectUri = `${window.location.origin}/api/oauth/callback`;
-  const state = btoa(redirectUri);
+  try {
+    const redirectUri = `${window.location.origin}/api/oauth/callback`;
+    const state = btoa(redirectUri);
 
-  const url = new URL(`${oauthPortalUrl}/app-auth`);
-  url.searchParams.set("appId", appId);
-  url.searchParams.set("redirectUri", redirectUri);
-  url.searchParams.set("state", state);
-  url.searchParams.set("type", "signIn");
+    const url = new URL(`${oauthPortalUrl}/app-auth`);
+    url.searchParams.set("appId", appId);
+    url.searchParams.set("redirectUri", redirectUri);
+    url.searchParams.set("state", state);
+    url.searchParams.set("type", "signIn");
 
-  return url.toString();
+    return url.toString();
+  } catch (error) {
+    console.error("Failed to construct login URL:", error);
+    return "#";
+  }
 };

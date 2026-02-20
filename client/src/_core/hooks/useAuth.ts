@@ -5,12 +5,20 @@ import { useCallback, useEffect, useMemo } from "react";
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
-  redirectPath?: string;
+  redirectPath?: string | null;
 };
 
 export function useAuth(options?: UseAuthOptions) {
-  const { redirectOnUnauthenticated = false, redirectPath = getLoginUrl() } =
+  const { redirectOnUnauthenticated = false, redirectPath } =
     options ?? {};
+  const loginUrl = useMemo(() => {
+    try {
+      return getLoginUrl();
+    } catch (error) {
+      console.error("Failed to get login URL:", error);
+      return "#";
+    }
+  }, []);
   const utils = trpc.useUtils();
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
@@ -65,12 +73,14 @@ export function useAuth(options?: UseAuthOptions) {
     if (meQuery.isLoading || logoutMutation.isPending) return;
     if (state.user) return;
     if (typeof window === "undefined") return;
-    if (window.location.pathname === redirectPath) return;
+    const finalRedirectPath = redirectPath || loginUrl;
+    if (window.location.pathname === finalRedirectPath) return;
 
-    window.location.href = redirectPath
+    window.location.href = finalRedirectPath
   }, [
     redirectOnUnauthenticated,
     redirectPath,
+    loginUrl,
     logoutMutation.isPending,
     meQuery.isLoading,
     state.user,
@@ -80,5 +90,6 @@ export function useAuth(options?: UseAuthOptions) {
     ...state,
     refresh: () => meQuery.refetch(),
     logout,
+    loginUrl,
   };
 }
